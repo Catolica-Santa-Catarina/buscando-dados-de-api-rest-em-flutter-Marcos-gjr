@@ -1,6 +1,11 @@
+import 'dart:developer';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import '../services/location.dart';
+
+const apiKey = 'ac9be9f7b1f18e9bac31d54a275a03f8';
 
 class LoadingScreen extends StatefulWidget {
   const LoadingScreen({Key? key}) : super(key: key);
@@ -10,46 +15,44 @@ class LoadingScreen extends StatefulWidget {
 }
 
 class _LoadingScreenState extends State<LoadingScreen> {
-  Future<void> checkLocationPermission() async {
-    bool serviceEnabled;
-    LocationPermission permission;
+  var loc = Location();
+  double? lat, long;
 
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      // serviço de localização desabilitado. Não será possível continuar
-      return Future.error('O serviço de localização está desabilitado.');
-    }
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        // Sem permissão para acessar a localização
-        return Future.error('Sem permissão para acesso à localização');
-      }
-    }
-    if (permission == LocationPermission.deniedForever) {
-      // permissões negadas para sempre
-      return Future.error('A permissão para acesso a localização foi negada para sempre. Não é possível pedir permissão.');
-    }
-  }
+  Future<void> getLocation() async{
 
 
-  void getLocation() async{
-    await checkLocationPermission();
 
-    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.low);
-    print(position);
+    await loc.getCurrentLocation();
+
+    lat = loc.lat;
+    long = loc.long;
+
+   // print(lat);
+   // print(long);
+    getData();
   }
 
   void getData() async {
-    var url = Uri.parse('https://samples.openweathermap.org/data/2.5/weather?lat=35&lon=139&appid=b6907d289e10d714a6e88b30761fae22');
+
+    lat = loc.lat;
+    long = loc.long;
+    var url = Uri.parse('https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$long&appid=$apiKey&units=metric');
     http.Response response = await http.get(url);
 
     if (response.statusCode == 200) { // se a requisição foi feita com sucesso
       var data = response.body;
+      var jsonData = jsonDecode(data);
+
+      var cityName = jsonData['name'];
+      var temperature = jsonData['main']['temp'];
+      var weatherCondition = jsonData['weather'][0]['id'];
+
+      print('cidade: $cityName, temperatura: $temperature, condição: $weatherCondition');
+
       print(data);  // imprima o resultado
     } else {
       print(response.statusCode);  // senão, imprima o código de erro
+
     }
   }
 

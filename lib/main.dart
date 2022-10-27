@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:tempo_template/screens/loading_screen.dart';
-import 'package:geolocator/geolocator.dart';
 
 void main() {
   runApp(const MyApp());
