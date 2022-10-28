@@ -1,9 +1,8 @@
-import 'dart:developer';
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:http/http.dart' as http;
 import '../services/location.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import '../services/weather.dart';
+import 'location_screen.dart';
 
 const apiKey = 'ac9be9f7b1f18e9bac31d54a275a03f8';
 
@@ -18,10 +17,15 @@ class _LoadingScreenState extends State<LoadingScreen> {
   var loc = Location();
   double? lat, long;
 
+  void pushToLocationScreen(dynamic weatherData) {
+
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return LocationScreen(localWeatherData: weatherData);
+    }));
+  }
+
+
   Future<void> getLocation() async{
-
-
-
     await loc.getCurrentLocation();
 
     lat = loc.lat;
@@ -29,10 +33,15 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
    // print(lat);
    // print(long);
+
     getData();
   }
 
-  void getData() async {
+  /*void getData() async {
+    NetworkHelper networkHelper = NetworkHelper('https://api.openweathermap.org/'
+        'data/2.5/weather?lat=$lat&lon=$long&appid=$apiKey&units=metric');
+
+    var weatherData = await networkHelper.getData();
 
     lat = loc.lat;
     long = loc.long;
@@ -47,26 +56,40 @@ class _LoadingScreenState extends State<LoadingScreen> {
       var temperature = jsonData['main']['temp'];
       var weatherCondition = jsonData['weather'][0]['id'];
 
-      print('cidade: $cityName, temperatura: $temperature, condição: $weatherCondition');
+      stderr.writeln('cidade: $cityName, temperatura: $temperature, condição: $weatherCondition');
 
-      print(data);  // imprima o resultado
+      stderr.writeln(data);  // imprima o resultado
     } else {
-      print(response.statusCode);  // senão, imprima o código de erro
+      stderr.writeln(response.statusCode);  // senão, imprima o código de erro
 
     }
+
+    pushToLocationScreen(weatherData);
+  }*/
+
+  void getData() async {
+    var weatherData = await WeatherModel().getLocationWeather();
+    pushToLocationScreen(weatherData);
   }
 
   @override
   void initState() {
     super.initState();
-    getLocation();
+    getData();
   }
+  /*@override
+  void initState() {
+    super.initState();
+    getLocation();
+  }*/
 
   @override
   Widget build(BuildContext context) {
-    getData();
-    return Scaffold(
-
+    return const Center(
+      child: SpinKitFoldingCube(
+        color: Colors.white,
+        size: 100.0,
+      ),
     );
   }
 }

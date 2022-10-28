@@ -577,6 +577,20 @@ receberá os dados json e os transmitirá para a próxima tela:
 
 ```
 
+### Transmitindo os dados de clima obtidos para a tela de clima
+Para podermos transmitir os dados do clima, primeiramente, na classe `LocationScreen`
+devemos criar um atributo. Este deve ser um atributo do tipo `dynamic`,
+pois é o tipo retornado pela função `getData`. Assim, crie o atributo:
+```dart
+final dynamic localWeatherData;
+```
+Além disso, você deve incluir este atributo no construtor desta classe, que ficará assim:
+```dart
+const LocationScreen({required this.localWeatherData, Key? key}) : super(key: key);
+```
+
+
+
 Note que a única mudança está no parâmetro recebido, que é transmitido para o construtor
 de `LocationScreen`, conforme a nossa alteração, no passo anterior.
 Além disso, precisamos alterar a chamada do método, em `getData`, passando os dados
@@ -668,7 +682,7 @@ Até aqui, conseguimos trazer as informações de localização e tempo e mostr�
 gostaríamos de utilizar o botão com uma "seta", posicionado no canto superior esquerdo da tela.
 Este botão, no código como `Icons.near_me`, deveria atualizar nossa posição (caso tenhamos nos movido,
 por exemplo), buscando novas informações de tempo para a localização atual. Para podermos buscar
-os dados de localização e tempo, também na `location_screen`, devemos refatorar o código. Até aqui, 
+os dados de localização e tempo, também na `location_screen`, devemos refatorar o código. Até aqui,
 a busca de dados está na `loading_screen`, que é uma tela e não deveria conter esse tipo de lógica.
 
 Isso é um problema também, pois se tentarmos acessar esses dados de outras telas (como é o nosso caso, aqui)
@@ -682,7 +696,7 @@ seria a mais adequada (ainda assim poderia ser motivo de debate, mas estamos, ne
 Primeiro, movemos os *imports* para `weather.dart`. Retire as duas linhas a seguir de `loading_screen` e mova-as para `weather.dart`.
 ```dart
 import 'package:tempo_template/services/location.dart';
-import 'package:tempo_template/services/networking.dart';
+import 'package:tempo_template/services/networking.dart';   
 ```
 
 Dentro da classe `WeatherModel`, crie um método `getLocationWeather()`, com o seguinte código:
@@ -740,7 +754,7 @@ onPressed: () async {
   updateUI(weatherData);
 },
 ```
-Note aqui que a função foi marcada como assíncrona, pois ela deve aguardar o térnimo da execução de `getLocationWeather` 
+Note aqui que a função foi marcada como assíncrona, pois ela deve aguardar o término da execução de `getLocationWeather` 
 para então chamar `updateUI`. Aqui o que fazemos é: ao pressionar o botão de localização (canto superior esquerdo da tela),
 atualizamos a localização do GPS e mostramos a nova informação de clima.
 
